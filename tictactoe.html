@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./tictoctoe.css">
+    <script src="./tictoctoe.js"></script>
+</head>
+    <style>
+        * {
+    padding : 0;
+    margin : 0;
+}
+
+.bg {
+    background-color: pink;
+    height: 100vh;
+    padding-top: 1px;
+}
+
+.title {
+    text-align: center;
+}
+
+.display {
+    color: white;
+    text-align: center;
+    font-size: 50px;
+    margin-top: 1em;
+    margin-top: 1em;
+    
+}
+
+.container {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    grid-template-rows: 33% 33% 33%;
+    max-width: 300px; 
+}
+
+.o {
+    border: 0.5px solid brown;
+    max-width: 100px;
+    max-height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+}
+
+.button {
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+}
+
+.button button {
+    color: teal;
+    padding: 8px;
+    margin-left: 1em;
+}
+
+.XXX {
+    color: green;
+}
+
+.OOO {
+    color: red;
+}
+
+#btn {
+    background-color: blue;
+}
+    </style>
+<body>
+    <main class="bg">
+        <section class="title">
+            <h1>Viết xai trính tã hết tên file rồi</h1>
+        </section>
+        
+        <section class="display">
+            Player <span class="player XXX">X</span>'s turn
+        </section>
+        
+        <section class="container">
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+            <div class="o"></div>
+        </section>
+
+        <section class="display annoucer hide"></section>
+
+        <section class="button" onclick="reset()">
+            <!-- phải dùng rieeng 1 cái function mới cho nó thì phải -->
+            <button id="btn">Reset</button>
+        </section>
+    </main>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+    const oo = Array.from(document.querySelectorAll('.o'));
+    const pLaYeR = document.querySelector('.player');
+    const resetBTN = document.querySelector('#btn');
+    const annoucer = document.querySelector('.annoucer');
+
+    let caibang = ['', '', '', '', '', '', '', '', '']; 
+    let nguoiChoiHienTai = 'X'; //vi X di truoc
+    let Gamedangchay = true; //vi game dang chay =))
+
+    //Lam cai thong bao neu ma no thang hay no thua
+    const playerx_won = 'playerx_won';
+    const playero_won = 'playero_won';
+    const tie = 'tie';
+
+    /*Cai bang no nhu nay
+    [0] [1] [2]
+    [3] [4] [5]
+    [6] [7] [8] */
+
+    const dieukienThang = [
+        [0,1,2], [3,4,5], [6, 7, 8], [0, 3, 6], [1, 4, 7],[2,5,8],[0,4,8],[2,4,6]
+    ];
+
+    function XetKetQua() {
+        let thang = false;
+        for (let i=0; i <= 7; i++) {
+            const win = dieukienThang[i];
+            const a = caibang[win[0]];
+            const b = caibang[win[1]];
+            const c = caibang[win[2]];
+            if (a === '' || b === '' || c === '') {
+                continue;
+            }
+
+            if (a === b && b === c) {
+                thang = true;
+                break;
+            }
+        }
+        
+        if (thang) {
+            annouce(nguoiChoiHienTai === 'X' ? playerx_won : playero_won) 
+            Gamedangchay = false;
+            return;
+        }
+
+        if (!caibang.includes('')) {
+            annouce(tie);
+        }
+    }
+
+    
+
+    const annouce = (type) => {
+        switch(type) {
+            case playero_won:
+                annoucer.innerHTML = 'Play <span class="playero">O</span>';
+                break;
+            case playerx_won:
+                annoucer.innerHTML = 'Play <span class="playerx">X</span>';
+                break;
+            case tie:
+                annoucer.innerHTML = 'Hoa';
+        }
+
+        annoucer.classList.remove('hide');
+    };
+
+    const thai = (o) => {
+        if (o.innerHTML === 'X' || o.innerHTML === 'O') {
+            return false;
+        }
+
+        return true;
+    };
+
+    const caibangnhungduoccapnhat = (index) => {
+        caibang[index] = nguoiChoiHienTai;
+    };
+
+    const doiNguoiChoi = () => {
+        pLaYeR.classList.remove(`player${nguoiChoiHienTai}`);
+        nguoiChoiHienTai = nguoiChoiHienTai === 'X' ? 'O' : 'X';
+        pLaYeR.innerHTML = nguoiChoiHienTai;
+        pLaYeR.classList.add(`player${nguoiChoiHienTai}`);
+    }
+
+    const hanhDong = (o, index) => {
+        if (thai(o) && Gamedangchay) {
+            o.innerText = nguoiChoiHienTai;
+            o.classList.add(`player${nguoiChoiHienTai}`);
+            caibangnhungduoccapnhat(index);
+            XetKetQua();
+            doiNguoiChoi();
+        }
+    }
+
+    const thaybangmoi = () => {
+        caibang = ['', '', '', '', '', '', '', '', ''];
+        Gamedangchay = true;
+        annoucer.classList.add('hide');
+
+        if (nguoiChoiHienTai === 'O') {
+            doiNguoiChoi();
+        }
+
+        oo.forEach(o => {
+            o.innerText = '';
+            o.classList.remove('XXX');
+            o.classList.remove('OOO');
+        });
+    }
+    // Chắc thế, thế check đi dể t thử
+
+    oo.forEach((o,index) => {
+        o.addEventListener('click', () => hanhDong(o, index));
+    });
+
+    resetBTN.addEventListener('click', caibangnhungduoccapnhat);
+});
+
+function reset() {
+    
+}
+    </script>
+</body>
+</html>
